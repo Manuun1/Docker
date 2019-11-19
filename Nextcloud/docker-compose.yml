@@ -1,0 +1,42 @@
+version: '2' 
+
+services:
+
+  db:
+    image: mariadb
+    restart: always
+    volumes:
+      - /opt/dockervolumes/nextcloud/mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=sehrgeheimroot
+    env_file:
+      - db.env
+    networks:
+      - nextcloudnet
+
+  nextcloud:
+    image: nextcloud:apache
+    restart: always
+    ports:
+      - 8094:80
+    links:
+      - db
+    volumes:
+      - /opt/dockervolumes/nextcloud/var_www_html:/var/www/html
+      - /opt/dockervolumes/nextcloud/data:/var/www/html/data
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      - MYSQL_HOST=db
+      - NEXTCLOUD_ADMIN_USER=admin
+      - NEXTCLOUD_ADMIN_PASSWORD=sehrgeheim456
+    env_file:
+      - db.env
+    networks:
+      - nextcloudnet
+
+
+networks:
+
+  nextcloudnet:
+    # empty
